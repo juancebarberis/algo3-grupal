@@ -36,7 +36,7 @@ descargar
 	destino agregarTodo: contenido.
 	self vaciar.! !
 
-!CintaAzul class methodsFor: 'as yet unclassified' stamp: 'AA 10/25/2020 14:47:52'!
+!CintaAzul class methodsFor: 'as yet unclassified' stamp: 'AA 10/28/2020 22:43:35'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -65,6 +65,10 @@ CintaRoja class
 agregar: unaMena
 	contenido add: unaMena.! !
 
+!CintaRoja class methodsFor: 'as yet unclassified' stamp: 'AA 10/28/2020 22:43:26'!
+agregarTodo: cargaDeMenas
+	contenido addAll: cargaDeMenas.! !
+
 !CintaRoja class methodsFor: 'as yet unclassified' stamp: 'AA 10/25/2020 14:16:35'!
 cantidadDe: unaMenaDeMuestra
 	^contenido count: [:unaMena | unaMena = unaMenaDeMuestra ].! !
@@ -82,7 +86,7 @@ descargar
 	destino agregarTodo: contenido.
 	self vaciar.! !
 
-!CintaRoja class methodsFor: 'as yet unclassified' stamp: 'AA 10/25/2020 14:47:52'!
+!CintaRoja class methodsFor: 'as yet unclassified' stamp: 'AA 10/28/2020 22:43:35'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -123,7 +127,7 @@ cantidadDe: unaMenaDeMuestra
 cantidadDeMenas
 	^contenido size.! !
 
-!Contenedor class methodsFor: 'as yet unclassified' stamp: 'AA 10/25/2020 14:47:52'!
+!Contenedor class methodsFor: 'as yet unclassified' stamp: 'AA 10/28/2020 22:43:35'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -155,7 +159,7 @@ conectarA: unDestino
 extraer
 	destino agregar: #carbon.! !
 
-!ExtractorDeCarbon class methodsFor: 'as yet unclassified' stamp: 'AA 10/25/2020 14:47:52'!
+!ExtractorDeCarbon class methodsFor: 'as yet unclassified' stamp: 'AA 10/28/2020 22:43:35'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -183,7 +187,7 @@ conectarA: unDestino
 extraer
 	destino agregar: #hierro.! !
 
-!ExtractorDeHierro class methodsFor: 'as yet unclassified' stamp: 'AA 10/25/2020 14:47:52'!
+!ExtractorDeHierro class methodsFor: 'as yet unclassified' stamp: 'AA 10/28/2020 22:43:35'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
