@@ -176,7 +176,7 @@ Object subclass: #CustomerBook
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBook methodsFor: 'initialization' stamp: 'LL 10/30/2020 12:22:04'!
+!CustomerBook methodsFor: 'initialization' stamp: 'AA 11/8/2020 16:09:04'!
 initialize
 
 	active := OrderedCollection new.
@@ -191,28 +191,10 @@ addCustomerNamed: aName
 	
 	active add: aName ! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'AA 11/8/2020 16:34:41'!
 removeCustomerNamed: aName 
- 
-	1 to: active size do: 
-	[ :index |
-		aName = (active at: index)
-			ifTrue: [
-				active removeAt: index.
-				^ aName 
-			] 
-	].
-
-	1 to: suspended size do: 	
-	[ :index |
-		aName = (suspended at: index)
-			ifTrue: [
-				suspended removeAt: index.
-				^ aName 
-			] 
-	].
-	
-	^ NotFound signal.
+	((self removeCustomer: aName ifExistsIn: active) or: (self removeCustomer: aName ifExistsIn: suspended)) 		ifTrue: [^aName].
+	^NotFound signal.
 ! !
 
 !CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
@@ -262,6 +244,20 @@ signalCustomerAlreadyExists
 signalCustomerNameCannotBeEmpty 
 
 	self error: self class customerCanNotBeEmptyErrorMessage ! !
+
+
+!CustomerBook methodsFor: 'private' stamp: 'AA 11/8/2020 16:29:07'!
+removeCustomer: aCustomer ifExistsIn: anOrderedCollection 
+
+	1 to: anOrderedCollection size do: 
+	[ :index |
+		aCustomer = (anOrderedCollection at: index)
+			ifTrue: [
+				anOrderedCollection removeAt: index.
+				^true 
+			] 
+	].
+	^false.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
