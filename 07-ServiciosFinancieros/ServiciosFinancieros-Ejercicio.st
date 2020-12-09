@@ -342,6 +342,10 @@ initializeFor: aValue
 	value := aValue ! !
 
 
+!Deposit methodsFor: 'value' stamp: 'jcb 12/9/2020 18:30:08'!
+accumulateInto: aBalance
+	^aBalance + value! !
+
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
 
@@ -424,6 +428,10 @@ initializeWith: aValue
 	value := aValue.! !
 
 
+!TransferDeposit methodsFor: 'accessing' stamp: 'jcb 12/9/2020 18:31:12'!
+accumulateInto: aBalance
+	^aBalance + value! !
+
 !TransferDeposit methodsFor: 'accessing' stamp: 'jcb 12/6/2020 20:18:51'!
 counterpart
 	^counterpart! !
@@ -469,6 +477,10 @@ initializeWith: aValue
 	value := aValue.! !
 
 
+!TransferWithdraw methodsFor: 'accessing' stamp: 'jcb 12/9/2020 18:31:26'!
+accumulateInto: aBalance
+	^aBalance - value! !
+
 !TransferWithdraw methodsFor: 'accessing' stamp: 'jcb 12/6/2020 20:18:36'!
 counterpart
 	^counterpart! !
@@ -510,6 +522,10 @@ initializeFor: aValue
 
 	value := aValue ! !
 
+
+!Withdraw methodsFor: 'value' stamp: 'jcb 12/9/2020 18:29:59'!
+accumulateInto: aBalance
+	^aBalance - value! !
 
 !Withdraw methodsFor: 'value' stamp: 'jcb 12/3/2020 21:21:26'!
 value
@@ -673,7 +689,7 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'jcb 12/6/2020 20:29:17'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'jcb 12/9/2020 18:32:03'!
 balance
 
 	| balance |
@@ -681,13 +697,9 @@ balance
 	balance := 0.
 	
 	transactions do: [
-		:aTransaction | 
-			(aTransaction isKindOf: Deposit) ifTrue: [balance := balance + aTransaction value].
-			(aTransaction isKindOf: Withdraw) ifTrue: [balance := balance - aTransaction value].
-			(aTransaction isKindOf: TransferDeposit) ifTrue: [ balance := balance + aTransaction value ].
-			(aTransaction isKindOf: TransferWithdraw) ifTrue: [ balance := balance - aTransaction value ].
+		:aTransaction | balance := aTransaction accumulateInto: balance.
 		].
-	
+
 	^balance! !
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'LL 9/20/2020 20:48:29'!
