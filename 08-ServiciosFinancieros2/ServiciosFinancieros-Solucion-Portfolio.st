@@ -259,7 +259,7 @@ TestCase subclass: #ReportsTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
 
-!ReportsTest methodsFor: 'tests' stamp: 'MS 12/10/2020 21:27:13'!
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:44:44'!
 test01AccountSummaryOfAnAccountWithoutTransactionsIsZero
 
 	| account accountSummary |
@@ -270,8 +270,8 @@ test01AccountSummaryOfAnAccountWithoutTransactionsIsZero
 	self assert: accountSummary size equals: 1.
 	self assert: (accountSummary at: 1) equals: 'Balance = 0 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'MS 12/10/2020 21:02:48'!
-test02
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:10:12'!
+test02AccountSummaryOfAnAccountWithADepositIsValid
 
 	| account accountSummary |
 	
@@ -283,8 +283,8 @@ test02
 	self assert: (accountSummary at: 1) equals: 'Depósito por 100 pesos'.
 	self assert: (accountSummary at: 2) equals: 'Balance = 100 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'MS 12/10/2020 21:10:58'!
-test03
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:10:58'!
+test03AccountSummaryOfAnAccountWithADepositAndWithdrawIsValid
 
 	| account accountSummary |
 	
@@ -298,8 +298,8 @@ test03
 	self assert: (accountSummary at: 2) equals: 'Extracción por 20 pesos'.
 	self assert: (accountSummary at: 3) equals: 'Balance = 80 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'MS 12/10/2020 21:15:19'!
-test04
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:11:49'!
+test04AccountSummaryOfAnAccountWithADepositAndTransferWithdrawIsValid
 
 	| account1 account2 accountSummary |
 	
@@ -314,8 +314,8 @@ test04
 	self assert: (accountSummary at: 2) equals: 'Salida por transferencia de 20 pesos'.
 	self assert: (accountSummary at: 3) equals: 'Balance = 80 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'MS 12/10/2020 21:17:30'!
-test05
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:12:13'!
+test05AccountSummaryOfAnAccountWithATransferDepositIsValid
 
 	| account1 account2 accountSummary |
 	
@@ -328,6 +328,125 @@ test05
 	self assert: accountSummary size equals: 2.
 	self assert: (accountSummary at: 1) equals: 'Entrada por transferencia de 20 pesos'.
 	self assert: (accountSummary at: 2) equals: 'Balance = 20 pesos'.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:41:29'!
+test06AccountSummaryOfAPortfolioWithoutTransactionsIsZero
+
+	| account portfolio portfolioSummary |
+	
+	portfolio := Portfolio new.
+	account := ReceptiveAccount new.
+	portfolio add: account.
+		
+	portfolioSummary := portfolio summary.
+	
+	self assert: portfolioSummary size equals: 1.
+	self assert: (portfolioSummary  at: 1) equals: 'Balance = 0 pesos'.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:42:00'!
+test07AccountSummaryOfAPortfolioWithTransactionsIsValid
+
+	| account1 account2 portfolio1 portfolio2 portfolioSummary |
+	
+	portfolio1 := Portfolio new.
+	portfolio2 := Portfolio new.
+	account1 := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	portfolio1 add: account1.
+	portfolio2 add: account2.
+	portfolio1 add: portfolio2.
+	
+	Deposit register: 20*peso on: account1.
+	Deposit register: 80*peso on: account2.
+		
+	portfolioSummary := portfolio1 summary.
+	
+	self assert: portfolioSummary size equals: 3.
+	self assert: (portfolioSummary at: 1) equals: 'Depósito por 20 pesos'.
+	self assert: (portfolioSummary at: 2) equals: 'Depósito por 80 pesos'.
+	self assert: (portfolioSummary  at: 3) equals: 'Balance = 100 pesos'.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:04:53'!
+test08NetTransfersOfAnAccountWithoutTransactionsIsZero
+	| account netTransfers |
+	
+	account := ReceptiveAccount new.
+	
+	netTransfers := account netTransfers.
+	
+	self assert: netTransfers equals: 0 * peso.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:05:53'!
+test09NetTransfersOfAccountsWithTransfersIsValid
+	| account1 account2 netTransfersOfAccount1 netTransfersOfAccount2 |
+	
+	account1 := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	Deposit register: 150 * peso on: account1.
+	Transfer amount: 100 * peso from: account1 to: account2.
+	
+	netTransfersOfAccount1 := account1 netTransfers.
+	netTransfersOfAccount2 := account2 netTransfers.
+	
+	self assert: netTransfersOfAccount1 equals: -100 * peso.
+	self assert: netTransfersOfAccount2 equals: 100 * peso.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:06:21'!
+test10NetTransfersOfAPortfolioWithoutTransactionsIsZero
+	| portfolio account netTransfers |
+	
+	portfolio := Portfolio new.
+	account := ReceptiveAccount new.
+	portfolio add: account.
+	
+	netTransfers := portfolio netTransfers.
+	
+	self assert: netTransfers equals: 0 * peso.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:06:59'!
+test11NetTransfersOfAPortfolioWithTransfersIsValid
+	| account1 account2 portfolio netTransfers |
+	
+	portfolio := Portfolio new.
+	account1 := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	portfolio add: account1.
+		
+	Deposit register: 150 * peso on: account1.
+	Transfer amount: 100 * peso from: account1 to: account2.
+	
+	netTransfers := portfolio netTransfers.
+	
+	self assert: netTransfers equals: -100 * peso.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:42:47'!
+test12
+
+	| account accountSummary |
+	
+	account := ReceptiveAccount new.
+	accountSummary := AccountSummary for: account.
+	accountSummary := accountSummary generateReport.
+	
+	self assert: accountSummary size equals: 1.
+	self assert: (accountSummary at: 1) equals: 'Balance = 0 pesos'.! !
+
+!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:43:20'!
+test13
+
+	| account accountSummary |
+	
+	account := ReceptiveAccount new.
+	accountSummary := AccountSummary for: account.
+	
+	Deposit register: 10 * peso on: account.
+	accountSummary := accountSummary generateReport.	
+	
+	self assert: accountSummary size equals: 2.
+	self assert: (accountSummary at: 1) equals: 'Depósito por 10 pesos'.
+	self assert: (accountSummary at: 2) equals: 'Balance = 10 pesos'.! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -556,6 +675,31 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:03:24'!
+netTransfers
+	| netTransfer |
+	netTransfer := 0.
+	
+	accounts do: [ :anAccount | netTransfer := netTransfer + anAccount netTransfers ].
+	
+	^netTransfer.! !
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 18:36:23'!
+summary
+	| portfolioSummary temp |
+	portfolioSummary := OrderedCollection new.
+		
+	accounts do: [:anAccount | 
+		temp := anAccount summary.
+		temp removeLast.
+		
+		portfolioSummary addAll: temp.
+		].
+	
+	portfolioSummary add: ('Balance = ', (self balance) asString).
+	^portfolioSummary.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -626,6 +770,19 @@ isComposedBy: anAccount
 
 	^self = anAccount ! !
 
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:38:12'!
+executeOverTransactions: aBlock
+	transactions do: aBlock.! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:13:32'!
+netTransfers
+	| netTransfers |
+	netTransfers := 0.
+	
+	transactions do: [ :aTransaction | 		netTransfers := aTransaction affectNetTransfers: netTransfers. 		].
+	
+	^netTransfers.! !
 
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MS 12/10/2020 21:25:30'!
 summary
@@ -707,6 +864,11 @@ affectBalance: aBalance
 
 	^aBalance + value ! !
 
+
+!Deposit methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:11:39'!
+affectNetTransfers: aNetTransfers
+	^aNetTransfers! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Deposit class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -778,6 +940,11 @@ summaryLine
 
 	^'Entrada por transferencia de ', (self value) asString.! !
 
+
+!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:12:43'!
+affectNetTransfers: aNetTransfers
+	^aNetTransfers + self value.! !
+
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion-Portfolio'!
 TransferLeg subclass: #TransferWithdrawLeg
@@ -802,6 +969,11 @@ summaryLine
 depositLeg
 
 	^transfer depositLeg! !
+
+
+!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:12:51'!
+affectNetTransfers: aNetTransfers
+	^aNetTransfers - self value.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -833,6 +1005,11 @@ affectBalance: aBalance
 
 	^aBalance - value! !
 
+
+!Withdraw methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:11:48'!
+affectNetTransfers: aNetTransfers
+	^aNetTransfers! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Withdraw class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -843,6 +1020,56 @@ Withdraw class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #Reports category: 'ServiciosFinancieros-Solucion-Portfolio'!
+Object subclass: #Reports
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion-Portfolio'!
+
+
+!classDefinition: #AccountSummary category: 'ServiciosFinancieros-Solucion-Portfolio'!
+Reports subclass: #AccountSummary
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion-Portfolio'!
+
+!AccountSummary methodsFor: 'initialization' stamp: 'jcb 12/13/2020 19:40:19'!
+initializeWith: anAccount
+	
+	account := anAccount.! !
+
+
+!AccountSummary methodsFor: 'report' stamp: 'jcb 12/13/2020 19:40:33'!
+generateReport
+	| report |
+	report := OrderedCollection new.
+	
+	account executeOverTransactions: [ :aTransaction | report add: aTransaction summaryLine ].	
+	
+	report add: ('Balance = ', (account balance) asString).
+	^report! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AccountSummary class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
+AccountSummary class
+	instanceVariableNames: ''!
+
+!AccountSummary class methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:29:38'!
+for: anAccount
+	^self new initializeWith: anAccount.! !
+
+
+!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion-Portfolio'!
+Reports subclass: #TransferNet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion-Portfolio'!
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Solucion-Portfolio'!
