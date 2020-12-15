@@ -1005,6 +1005,11 @@ executeForWithdraw: aWithdraw
 
 	self subclassResponsibility.! !
 
+!Reports methodsFor: 'reports' stamp: 'MS 12/14/2020 22:20:39'!
+generateReport
+
+	self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Reports class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
