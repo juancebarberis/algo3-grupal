@@ -259,31 +259,33 @@ TestCase subclass: #ReportsTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:44:44'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:44:34'!
 test01AccountSummaryOfAnAccountWithoutTransactionsIsZero
 
 	| account accountSummary |
 	
 	account := ReceptiveAccount new.
-	accountSummary := account summary.
+	accountSummary := AccountSummary for: account.
+	accountSummary := accountSummary generateReport.
 	
 	self assert: accountSummary size equals: 1.
 	self assert: (accountSummary at: 1) equals: 'Balance = 0 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:10:12'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:44:44'!
 test02AccountSummaryOfAnAccountWithADepositIsValid
 
 	| account accountSummary |
 	
 	account := ReceptiveAccount new.
 	Deposit register: 100 * peso on: account.
-	accountSummary := account summary.
-	
+	accountSummary := AccountSummary for: account.
+	accountSummary := accountSummary generateReport.
+		
 	self assert: accountSummary size equals: 2.
 	self assert: (accountSummary at: 1) equals: 'Depósito por 100 pesos'.
 	self assert: (accountSummary at: 2) equals: 'Balance = 100 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:10:58'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:44:57'!
 test03AccountSummaryOfAnAccountWithADepositAndWithdrawIsValid
 
 	| account accountSummary |
@@ -291,14 +293,15 @@ test03AccountSummaryOfAnAccountWithADepositAndWithdrawIsValid
 	account := ReceptiveAccount new.
 	Deposit register: 100 * peso on: account.
 	Withdraw register: 20 * peso on: account.
-	accountSummary := account summary.
-	
+	accountSummary := AccountSummary for: account.
+	accountSummary := accountSummary generateReport.
+		
 	self assert: accountSummary size equals: 3.
 	self assert: (accountSummary at: 1) equals: 'Depósito por 100 pesos'.
 	self assert: (accountSummary at: 2) equals: 'Extracción por 20 pesos'.
 	self assert: (accountSummary at: 3) equals: 'Balance = 80 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:11:49'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:45:26'!
 test04AccountSummaryOfAnAccountWithADepositAndTransferWithdrawIsValid
 
 	| account1 account2 accountSummary |
@@ -307,14 +310,15 @@ test04AccountSummaryOfAnAccountWithADepositAndTransferWithdrawIsValid
 	account2 := ReceptiveAccount new.
 	Deposit register: 100 * peso on: account1.
 	Transfer amount: 20 * peso from: account1 to: account2.
-	accountSummary := account1 summary.
-	
+	accountSummary := AccountSummary for: account1.
+	accountSummary := accountSummary generateReport.
+		
 	self assert: accountSummary size equals: 3.
 	self assert: (accountSummary at: 1) equals: 'Depósito por 100 pesos'.
 	self assert: (accountSummary at: 2) equals: 'Salida por transferencia de 20 pesos'.
 	self assert: (accountSummary at: 3) equals: 'Balance = 80 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:12:13'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:45:41'!
 test05AccountSummaryOfAnAccountWithATransferDepositIsValid
 
 	| account1 account2 accountSummary |
@@ -323,13 +327,14 @@ test05AccountSummaryOfAnAccountWithATransferDepositIsValid
 	account2 := ReceptiveAccount new.
 	Deposit register: 100 * peso on: account1.
 	Transfer amount: 20 * peso from: account1 to: account2.
-	accountSummary := account2 summary.
-	
+	accountSummary := AccountSummary for: account2.
+	accountSummary := accountSummary generateReport.
+		
 	self assert: accountSummary size equals: 2.
 	self assert: (accountSummary at: 1) equals: 'Entrada por transferencia de 20 pesos'.
 	self assert: (accountSummary at: 2) equals: 'Balance = 20 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:41:29'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:49:43'!
 test06AccountSummaryOfAPortfolioWithoutTransactionsIsZero
 
 	| account portfolio portfolioSummary |
@@ -338,12 +343,13 @@ test06AccountSummaryOfAPortfolioWithoutTransactionsIsZero
 	account := ReceptiveAccount new.
 	portfolio add: account.
 		
-	portfolioSummary := portfolio summary.
-	
+	portfolioSummary := AccountSummary for: portfolio.
+	portfolioSummary := portfolioSummary generateReport.
+		
 	self assert: portfolioSummary size equals: 1.
 	self assert: (portfolioSummary  at: 1) equals: 'Balance = 0 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 18:42:00'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 19:50:00'!
 test07AccountSummaryOfAPortfolioWithTransactionsIsValid
 
 	| account1 account2 portfolio1 portfolio2 portfolioSummary |
@@ -359,26 +365,28 @@ test07AccountSummaryOfAPortfolioWithTransactionsIsValid
 	Deposit register: 20*peso on: account1.
 	Deposit register: 80*peso on: account2.
 		
-	portfolioSummary := portfolio1 summary.
+	portfolioSummary := AccountSummary for: portfolio1.
+	portfolioSummary := portfolioSummary generateReport.
 	
 	self assert: portfolioSummary size equals: 3.
 	self assert: (portfolioSummary at: 1) equals: 'Depósito por 20 pesos'.
 	self assert: (portfolioSummary at: 2) equals: 'Depósito por 80 pesos'.
 	self assert: (portfolioSummary  at: 3) equals: 'Balance = 100 pesos'.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:04:53'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 20:29:31'!
 test08NetTransfersOfAnAccountWithoutTransactionsIsZero
-	| account netTransfers |
+	| account transferNet |
 	
 	account := ReceptiveAccount new.
 	
-	netTransfers := account netTransfers.
+	transferNet := TransferNet for: account.
+	transferNet := transferNet generateReport.
 	
-	self assert: netTransfers equals: 0 * peso.! !
+	self assert: transferNet equals: 0 * peso.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:05:53'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 20:31:10'!
 test09NetTransfersOfAccountsWithTransfersIsValid
-	| account1 account2 netTransfersOfAccount1 netTransfersOfAccount2 |
+	| account1 account2 transferNetOfAccount1 transferNetOfAccount2 |
 	
 	account1 := ReceptiveAccount new.
 	account2 := ReceptiveAccount new.
@@ -386,27 +394,30 @@ test09NetTransfersOfAccountsWithTransfersIsValid
 	Deposit register: 150 * peso on: account1.
 	Transfer amount: 100 * peso from: account1 to: account2.
 	
-	netTransfersOfAccount1 := account1 netTransfers.
-	netTransfersOfAccount2 := account2 netTransfers.
+	transferNetOfAccount1 := TransferNet for: account1.
+	transferNetOfAccount2 := TransferNet for: account2.
+	transferNetOfAccount1 := transferNetOfAccount1 generateReport.
+	transferNetOfAccount2 := transferNetOfAccount2 generateReport.
 	
-	self assert: netTransfersOfAccount1 equals: -100 * peso.
-	self assert: netTransfersOfAccount2 equals: 100 * peso.! !
+	self assert: transferNetOfAccount1 equals: -100 * peso.
+	self assert: transferNetOfAccount2 equals: 100 * peso.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:06:21'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 20:34:24'!
 test10NetTransfersOfAPortfolioWithoutTransactionsIsZero
-	| portfolio account netTransfers |
+	| portfolio account transferNet |
 	
 	portfolio := Portfolio new.
 	account := ReceptiveAccount new.
 	portfolio add: account.
 	
-	netTransfers := portfolio netTransfers.
+	transferNet := TransferNet for: account.
+	transferNet := transferNet generateReport.
 	
-	self assert: netTransfers equals: 0 * peso.! !
+	self assert: transferNet equals: 0 * peso.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:06:59'!
+!ReportsTest methodsFor: 'tests' stamp: 'MS 12/14/2020 20:35:23'!
 test11NetTransfersOfAPortfolioWithTransfersIsValid
-	| account1 account2 portfolio netTransfers |
+	| account1 account2 portfolio transferNet |
 	
 	portfolio := Portfolio new.
 	account1 := ReceptiveAccount new.
@@ -417,36 +428,24 @@ test11NetTransfersOfAPortfolioWithTransfersIsValid
 	Deposit register: 150 * peso on: account1.
 	Transfer amount: 100 * peso from: account1 to: account2.
 	
-	netTransfers := portfolio netTransfers.
+	transferNet := TransferNet for: portfolio.
+	transferNet := transferNet generateReport.
 	
-	self assert: netTransfers equals: -100 * peso.! !
+	self assert: transferNet equals: -100 * peso.! !
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:42:47'!
-test12
 
-	| account accountSummary |
-	
-	account := ReceptiveAccount new.
-	accountSummary := AccountSummary for: account.
-	accountSummary := accountSummary generateReport.
-	
-	self assert: accountSummary size equals: 1.
-	self assert: (accountSummary at: 1) equals: 'Balance = 0 pesos'.! !
+!ReportsTest methodsFor: 'tests - bonus track' stamp: 'MS 12/14/2020 21:02:47'!
+test01
 
-!ReportsTest methodsFor: 'tests' stamp: 'jcb 12/13/2020 19:43:20'!
-test13
+	"| account portfolio portfolioTreePrinter |
+	account := ReceptiveAccount named: 'Cuenta mía'. 
+	portfolio := Portfolio named: 'Portfolio de la familia' with: account.
+	
+	portfolioTreePrinter := PortfolioTreePrinter new.
+	portfolioTreePrinter := portfolioTreePrinter generateReport.
 
-	| account accountSummary |
-	
-	account := ReceptiveAccount new.
-	accountSummary := AccountSummary for: account.
-	
-	Deposit register: 10 * peso on: account.
-	accountSummary := accountSummary generateReport.	
-	
-	self assert: accountSummary size equals: 2.
-	self assert: (accountSummary at: 1) equals: 'Depósito por 10 pesos'.
-	self assert: (accountSummary at: 2) equals: 'Balance = 10 pesos'.! !
+	self assert: (portfolioTreePrinter at: 1) equals: 'Portfolio de la familia'.
+	self assert: (portfolioTreePrinter at: 2) equals: (String tab, 'Cuenta mía')."! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -456,7 +455,7 @@ TestCase subclass: #TransferTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 21:07:03'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 21:07:03'!
 test01ATransferDecreasesBalanceFromOriginAccountAndIncreasesItForDestinationAccount
 
 	| destinationAccount originAccount |
@@ -472,7 +471,7 @@ test01ATransferDecreasesBalanceFromOriginAccountAndIncreasesItForDestinationAcco
 	self assert: 8 * peso equals: originAccount balance.
 	self assert: 12 * peso equals: destinationAccount balance.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 21:12:28'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 21:12:28'!
 test02ATransferKnowsItsValue
 
 	| destinationAccount originAccount transfer |
@@ -487,7 +486,7 @@ test02ATransferKnowsItsValue
 	
 	self assert: 2 * peso equals: transfer value.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:01:44'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:01:44'!
 test03DepositLegKnowsItsWithdrawCounterpart
 
 	| destinationAccount originAccount transfer |
@@ -502,7 +501,7 @@ test03DepositLegKnowsItsWithdrawCounterpart
 	
 	self assert: transfer withdrawLeg equals: transfer depositLeg withdrawLeg! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:01:51'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:01:51'!
 test04WithdrawLegKnowsItsDepositCounterpart
 
 	| destinationAccount originAccount transfer |
@@ -517,7 +516,7 @@ test04WithdrawLegKnowsItsDepositCounterpart
 	
 	self assert: transfer depositLeg equals: transfer withdrawLeg depositLeg! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:02:36'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:02:36'!
 test05OriginAndDestinationAccountsCannotBeTheSame
 
 	| originAccount |
@@ -533,7 +532,7 @@ test05OriginAndDestinationAccountsCannotBeTheSame
 		]
 ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:02:44'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:02:44'!
 test06CannotTransferAZeroAmount
 
 	| originAccount destinationAccount |
@@ -564,6 +563,11 @@ Object subclass: #Account
 balance
 
 	self subclassResponsibility ! !
+
+!Account methodsFor: 'main protocol' stamp: 'MS 12/14/2020 20:01:00'!
+executeOverTransactions: aBlock
+	
+	self subclassResponsibility.! !
 
 !Account methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 12:23:47'!
 hasRegistered: aTransaction
@@ -600,6 +604,11 @@ initialize
 balance
 	
 	^accounts sum: [ :anAccount | anAccount balance ] ifEmpty: [ 0 * peso ]! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'MS 12/14/2020 19:49:24'!
+executeOverTransactions: aBlock
+	
+	accounts do: [ :anAccount | anAccount executeOverTransactions: aBlock ].! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:28:29'!
 hasRegistered: aTransaction
@@ -675,31 +684,6 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:03:24'!
-netTransfers
-	| netTransfer |
-	netTransfer := 0.
-	
-	accounts do: [ :anAccount | netTransfer := netTransfer + anAccount netTransfers ].
-	
-	^netTransfer.! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 18:36:23'!
-summary
-	| portfolioSummary temp |
-	portfolioSummary := OrderedCollection new.
-		
-	accounts do: [:anAccount | 
-		temp := anAccount summary.
-		temp removeLast.
-		
-		portfolioSummary addAll: temp.
-		].
-	
-	portfolioSummary add: ('Balance = ', (self balance) asString).
-	^portfolioSummary.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -747,6 +731,11 @@ balance
 		inject: 0 * peso
 		into: [ :currentBalance :transaction | transaction affectBalance: currentBalance ]! !
 
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'MS 12/14/2020 20:37:02'!
+executeOverTransactions: aBlock
+
+	transactions do: aBlock.! !
+
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'LL 9/20/2020 20:53:32'!
 hasRegistered: aTransaction
 
@@ -770,30 +759,6 @@ isComposedBy: anAccount
 
 	^self = anAccount ! !
 
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:38:12'!
-executeOverTransactions: aBlock
-	transactions do: aBlock.! !
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:13:32'!
-netTransfers
-	| netTransfers |
-	netTransfers := 0.
-	
-	transactions do: [ :aTransaction | 		netTransfers := aTransaction affectNetTransfers: netTransfers. 		].
-	
-	^netTransfers.! !
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MS 12/10/2020 21:25:30'!
-summary
-
-	| accountSummary |
-	accountSummary := OrderedCollection new.
-	
-	transactions do: [ :aTransaction | accountSummary add: (aTransaction summaryLine)		].
-	accountSummary add: ('Balance = ', (self balance) asString).
-	^accountSummary.! !
-
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion-Portfolio'!
 Object subclass: #AccountTransaction
@@ -802,15 +767,16 @@ Object subclass: #AccountTransaction
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
 
-!AccountTransaction methodsFor: 'value' stamp: 'MS 12/10/2020 21:25:14'!
-summaryLine
-
-	self subclassResponsibility.! !
-
 !AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
 value 
 
 	self subclassResponsibility ! !
+
+
+!AccountTransaction methodsFor: 'reports' stamp: 'MS 12/14/2020 20:38:36'!
+dispatchReport: aReport
+
+	self subclassResponsibility.! !
 
 
 !AccountTransaction methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:39'!
@@ -848,11 +814,6 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Deposit methodsFor: 'value' stamp: 'MS 12/10/2020 21:22:45'!
-summaryLine
-
-	^'Depósito por ', (self value) asString.! !
-
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
 
@@ -865,9 +826,10 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:11:39'!
-affectNetTransfers: aNetTransfers
-	^aNetTransfers! !
+!Deposit methodsFor: 'reports' stamp: 'MS 12/14/2020 20:40:03'!
+dispatchReport: aReport
+
+	^aReport executeForDeposit: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -935,15 +897,11 @@ withdrawLeg
 	^transfer withdrawLeg! !
 
 
-!TransferDepositLeg methodsFor: 'value' stamp: 'MS 12/10/2020 21:24:22'!
-summaryLine
 
-	^'Entrada por transferencia de ', (self value) asString.! !
+!TransferDepositLeg methodsFor: 'reports' stamp: 'MS 12/14/2020 20:41:26'!
+dispatchReport: aReport
 
-
-!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:12:43'!
-affectNetTransfers: aNetTransfers
-	^aNetTransfers + self value.! !
+	^aReport executeForTransferDeposit: self.! !
 
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -959,11 +917,6 @@ affectBalance: aBalance
 	^aBalance - self value! !
 
 
-!TransferWithdrawLeg methodsFor: 'value' stamp: 'MS 12/10/2020 21:24:41'!
-summaryLine
-
-	^'Salida por transferencia de ', (self value) asString.! !
-
 
 !TransferWithdrawLeg methodsFor: 'accessing' stamp: 'LL 9/20/2020 22:25:47'!
 depositLeg
@@ -971,9 +924,10 @@ depositLeg
 	^transfer depositLeg! !
 
 
-!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:12:51'!
-affectNetTransfers: aNetTransfers
-	^aNetTransfers - self value.! !
+!TransferWithdrawLeg methodsFor: 'reports' stamp: 'MS 12/14/2020 20:41:26'!
+dispatchReport: aReport
+
+	^aReport executeForTransferWithdraw: self.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -989,11 +943,6 @@ initializeFor: aValue
 	value := aValue ! !
 
 
-!Withdraw methodsFor: 'value' stamp: 'MS 12/10/2020 21:23:40'!
-summaryLine
-
-	^'Extracción por ', (self value) asString.! !
-
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
 
@@ -1006,9 +955,10 @@ affectBalance: aBalance
 	^aBalance - value! !
 
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:11:48'!
-affectNetTransfers: aNetTransfers
-	^aNetTransfers! !
+!Withdraw methodsFor: 'reports' stamp: 'MS 12/14/2020 20:41:26'!
+dispatchReport: aReport
+
+	^aReport executeForWithdraw: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1029,6 +979,43 @@ Object subclass: #Reports
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
 
+!Reports methodsFor: 'initialization' stamp: 'MS 12/14/2020 20:47:10'!
+initializeWith: anAccount
+
+	self subclassResponsibility.! !
+
+
+!Reports methodsFor: 'reports' stamp: 'MS 12/14/2020 20:25:23'!
+executeForDeposit: aDeposit
+
+	self subclassResponsibility.! !
+
+!Reports methodsFor: 'reports' stamp: 'MS 12/14/2020 20:26:22'!
+executeForTransferDeposit: aTransferDeposit
+
+	self subclassResponsibility.! !
+
+!Reports methodsFor: 'reports' stamp: 'MS 12/14/2020 20:26:07'!
+executeForTransferWithdraw: aTransferWithdraw
+
+	self subclassResponsibility.! !
+
+!Reports methodsFor: 'reports' stamp: 'MS 12/14/2020 20:26:32'!
+executeForWithdraw: aWithdraw
+
+	self subclassResponsibility.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Reports class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
+Reports class
+	instanceVariableNames: ''!
+
+!Reports class methodsFor: 'instance creation' stamp: 'MS 12/14/2020 20:46:09'!
+for: anAccount
+
+	self subclassResponsibility.! !
+
 
 !classDefinition: #AccountSummary category: 'ServiciosFinancieros-Solucion-Portfolio'!
 Reports subclass: #AccountSummary
@@ -1043,12 +1030,32 @@ initializeWith: anAccount
 	account := anAccount.! !
 
 
-!AccountSummary methodsFor: 'report' stamp: 'jcb 12/13/2020 19:40:33'!
+!AccountSummary methodsFor: 'reports' stamp: 'MS 12/14/2020 20:17:02'!
+executeForDeposit: aDeposit
+
+	^'Depósito por ', (aDeposit value) asString.! !
+
+!AccountSummary methodsFor: 'reports' stamp: 'MS 12/14/2020 20:17:34'!
+executeForTransferDeposit: aTransferDeposit
+
+	^'Entrada por transferencia de ', (aTransferDeposit value) asString.! !
+
+!AccountSummary methodsFor: 'reports' stamp: 'MS 12/14/2020 20:18:01'!
+executeForTransferWithdraw: aTransferWithdraw
+
+	^'Salida por transferencia de ', (aTransferWithdraw value) asString.! !
+
+!AccountSummary methodsFor: 'reports' stamp: 'MS 12/14/2020 20:18:26'!
+executeForWithdraw: aWithdraw
+
+	^'Extracción por ', (aWithdraw value) asString.! !
+
+!AccountSummary methodsFor: 'reports' stamp: 'MS 12/14/2020 20:40:03'!
 generateReport
 	| report |
 	report := OrderedCollection new.
 	
-	account executeOverTransactions: [ :aTransaction | report add: aTransaction summaryLine ].	
+	account executeOverTransactions: [ :aTransaction | report add: (aTransaction dispatchReport: self) ].	
 	
 	report add: ('Balance = ', (account balance) asString).
 	^report! !
@@ -1059,17 +1066,73 @@ generateReport
 AccountSummary class
 	instanceVariableNames: ''!
 
-!AccountSummary class methodsFor: 'as yet unclassified' stamp: 'jcb 12/13/2020 19:29:38'!
+!AccountSummary class methodsFor: 'instance creation' stamp: 'MS 12/14/2020 20:45:31'!
 for: anAccount
+
 	^self new initializeWith: anAccount.! !
 
 
-!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion-Portfolio'!
-Reports subclass: #TransferNet
+!classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion-Portfolio'!
+Reports subclass: #PortfolioTreePrinter
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
+
+
+!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion-Portfolio'!
+Reports subclass: #TransferNet
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion-Portfolio'!
+
+!TransferNet methodsFor: 'initialization' stamp: 'MS 12/14/2020 20:06:09'!
+initializeWith: anAccount
+	
+	account := anAccount.! !
+
+
+!TransferNet methodsFor: 'reports' stamp: 'MS 12/14/2020 20:22:53'!
+executeForDeposit: aDeposit
+
+	^0.! !
+
+!TransferNet methodsFor: 'reports' stamp: 'MS 12/14/2020 20:24:43'!
+executeForTransferDeposit: aTransferDeposit
+
+	^aTransferDeposit value.! !
+
+!TransferNet methodsFor: 'reports' stamp: 'MS 12/14/2020 20:24:24'!
+executeForTransferWithdraw: aTransferWithdraw
+
+	^aTransferWithdraw value negated.! !
+
+!TransferNet methodsFor: 'reports' stamp: 'MS 12/14/2020 20:23:25'!
+executeForWithdraw: aWithdraw
+
+	^0.! !
+
+!TransferNet methodsFor: 'reports' stamp: 'MS 12/14/2020 21:22:22'!
+generateReport
+
+	| transferNet |
+	transferNet := 0 * peso.
+	
+	account executeOverTransactions: [ :aTransaction | transferNet := transferNet + (aTransaction dispatchReport: self) ].	
+	
+	^transferNet .! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferNet class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
+TransferNet class
+	instanceVariableNames: ''!
+
+!TransferNet class methodsFor: 'instance creation' stamp: 'MS 12/14/2020 20:45:42'!
+for: anAccount
+
+	^self new initializeWith: anAccount.! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Solucion-Portfolio'!
