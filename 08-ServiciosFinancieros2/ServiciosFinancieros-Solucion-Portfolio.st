@@ -434,18 +434,43 @@ test11NetTransfersOfAPortfolioWithTransfersIsValid
 	self assert: transferNet equals: -100 * peso.! !
 
 
-!ReportsTest methodsFor: 'tests - bonus track' stamp: 'MS 12/14/2020 21:02:47'!
-test01
+!ReportsTest methodsFor: 'tests - bonus track' stamp: 'jcb 12/16/2020 21:27:48'!
+test01PortfolioTreePrinterOfAPorfolioWithOneAccountIsValid
 
-	"| account portfolio portfolioTreePrinter |
+	| account portfolio portfolioTreePrinter |
 	account := ReceptiveAccount named: 'Cuenta mía'. 
 	portfolio := Portfolio named: 'Portfolio de la familia' with: account.
 	
-	portfolioTreePrinter := PortfolioTreePrinter new.
+	portfolioTreePrinter := PortfolioTreePrinter for: portfolio.
 	portfolioTreePrinter := portfolioTreePrinter generateReport.
 
 	self assert: (portfolioTreePrinter at: 1) equals: 'Portfolio de la familia'.
-	self assert: (portfolioTreePrinter at: 2) equals: (String tab, 'Cuenta mía')."! !
+	self assert: (portfolioTreePrinter at: 2) equals: '  Cuenta mía'.! !
+
+!ReportsTest methodsFor: 'tests - bonus track' stamp: 'jcb 12/16/2020 21:29:45'!
+test02PortfolioTreePrinterOfAPortfolioWithAccountsAndChildPorfoliosIsValid
+
+	| johnsAccount angiesAccount maryAccount childrenPortfolio myAccount familyPortfolio portfolioTreePrinter |
+	
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
+	angiesAccount := ReceptiveAccount named: 'Cuenta de Angeles'. 
+	maryAccount := ReceptiveAccount named: 'Cuenta de María'.
+	childrenPortfolio := Portfolio named: 'Portfolio de hijos' with: johnsAccount.
+	childrenPortfolio add: angiesAccount. 
+	myAccount := ReceptiveAccount named: 'Cuenta mia'. 
+	familyPortfolio := Portfolio named: 'Portfolio de la familia' with: myAccount.
+	familyPortfolio add: childrenPortfolio.
+	familyPortfolio add: maryAccount.
+	
+	portfolioTreePrinter := PortfolioTreePrinter for: familyPortfolio.
+	portfolioTreePrinter := portfolioTreePrinter generateReport.
+
+	self assert: 'Portfolio de la familia' equals: (portfolioTreePrinter at: 1).
+	self assert: '  Cuenta mia' equals: (portfolioTreePrinter at: 2).
+	self assert: '  Portfolio de hijos' equals: (portfolioTreePrinter at: 3).
+	self assert: '    Cuenta de Juan' equals: (portfolioTreePrinter at: 4).
+	self assert: '    Cuenta de Angeles' equals: (portfolioTreePrinter at: 5).
+	self assert: '  Cuenta de María' equals: (portfolioTreePrinter at: 6).! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -588,7 +613,7 @@ isComposedBy: anAccount
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Solucion-Portfolio'!
 Account subclass: #Portfolio
-	instanceVariableNames: 'accounts parents'
+	instanceVariableNames: 'accounts parents name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -599,11 +624,26 @@ initialize
 	accounts := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
+!Portfolio methodsFor: 'initialization' stamp: 'jcb 12/16/2020 19:36:03'!
+initializeNamed: aName add: accountToAdd
+
+	self assertCanAdd: accountToAdd.
+		
+	accounts add: accountToAdd.
+	accountToAdd addedTo: self.
+	name := aName
+	! !
+
 
 !Portfolio methodsFor: 'main protocol' stamp: 'LL 9/21/2020 01:35:22'!
 balance
 	
 	^accounts sum: [ :anAccount | anAccount balance ] ifEmpty: [ 0 * peso ]! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'jcb 12/16/2020 19:56:40'!
+executeOverAccounts: aBlock
+	
+	accounts do: aBlock.! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'MS 12/14/2020 19:49:24'!
 executeOverTransactions: aBlock
@@ -614,6 +654,10 @@ executeOverTransactions: aBlock
 hasRegistered: aTransaction
 
 	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ]! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'jcb 12/16/2020 19:52:06'!
+name
+	^name! !
 
 
 !Portfolio methodsFor: 'accounts management' stamp: 'HAW 5/25/2019 11:49:06'!
@@ -695,10 +739,16 @@ canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'jcb 12/16/2020 19:34:04'!
+named: aName with: anAccount
+
+	^self new initializeNamed: aName 	add: anAccount ;
+		yourself! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'jcb 12/16/2020 19:35:01'!
 with: anAccount
 
-	^self new 
+	^self new 	
 		add: anAccount;
 		yourself! !
 
@@ -713,7 +763,7 @@ with: anAccount with: anotherAccount
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Solucion-Portfolio'!
 Account subclass: #ReceptiveAccount
-	instanceVariableNames: 'transactions'
+	instanceVariableNames: 'transactions name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -722,6 +772,12 @@ Account subclass: #ReceptiveAccount
 initialize
 
 	transactions := OrderedCollection new.! !
+
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'jcb 12/16/2020 19:30:14'!
+initializeNamed: aName
+
+	transactions := OrderedCollection new.
+	name := aName! !
 
 
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'LL 9/21/2020 01:35:28'!
@@ -742,6 +798,10 @@ hasRegistered: aTransaction
 	^transactions includes: aTransaction
 ! !
 
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'jcb 12/16/2020 19:52:51'!
+name
+	^name! !
+
 !ReceptiveAccount methodsFor: 'main protocol' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction
 
@@ -758,6 +818,16 @@ addedTo: aPortfolio
 isComposedBy: anAccount
 
 	^self = anAccount ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReceptiveAccount class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
+ReceptiveAccount class
+	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'instance creation' stamp: 'jcb 12/16/2020 19:29:32'!
+named: aName 
+	^self new initializeNamed: aName! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion-Portfolio'!
@@ -897,7 +967,6 @@ withdrawLeg
 	^transfer withdrawLeg! !
 
 
-
 !TransferDepositLeg methodsFor: 'reports' stamp: 'MS 12/14/2020 20:41:26'!
 dispatchReport: aReport
 
@@ -915,7 +984,6 @@ TransferLeg subclass: #TransferWithdrawLeg
 affectBalance: aBalance
 
 	^aBalance - self value! !
-
 
 
 !TransferWithdrawLeg methodsFor: 'accessing' stamp: 'LL 9/20/2020 22:25:47'!
@@ -1079,10 +1147,58 @@ for: anAccount
 
 !classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion-Portfolio'!
 Reports subclass: #PortfolioTreePrinter
-	instanceVariableNames: ''
+	instanceVariableNames: 'portfolio'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion-Portfolio'!
+
+!PortfolioTreePrinter methodsFor: 'reports' stamp: 'jcb 12/16/2020 21:24:21'!
+generateReport
+	| report |
+	report := OrderedCollection new.
+	
+	report addAll: (self generateReportWithIndentDepth: 0 forPortfolio: portfolio).
+	
+	^report.! !
+
+!PortfolioTreePrinter methodsFor: 'reports' stamp: 'jcb 12/16/2020 21:26:59'!
+generateReportWithIndentDepth: anIndentDepth forPortfolio: aPortfolio
+	| report indentString indentDepth |
+	report := OrderedCollection new.
+	indentString := ''.
+	
+	anIndentDepth timesRepeat: [indentString := ('  ', indentString)].
+	
+	report add: (indentString, aPortfolio name).
+	
+	indentDepth := anIndentDepth + 1.
+	indentString := ('  ', indentString).
+	
+	aPortfolio executeOverAccounts: [ :anAccount |
+		(anAccount isKindOf: ReceptiveAccount) ifTrue: [report add: (indentString, anAccount name)].
+		(anAccount isKindOf: Portfolio) ifTrue: [
+				report addAll: (self generateReportWithIndentDepth: indentDepth forPortfolio: anAccount).						
+			].
+		].
+	
+	^report.
+	! !
+
+
+!PortfolioTreePrinter methodsFor: 'initialization' stamp: 'jcb 12/16/2020 19:55:07'!
+initializeWith: aPortfolio
+	portfolio := aPortfolio ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioTreePrinter class' category: 'ServiciosFinancieros-Solucion-Portfolio'!
+PortfolioTreePrinter class
+	instanceVariableNames: ''!
+
+!PortfolioTreePrinter class methodsFor: 'instance creation' stamp: 'jcb 12/16/2020 19:55:22'!
+for: aPortfolio
+	^self new initializeWith: aPortfolio
+	! !
 
 
 !classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion-Portfolio'!
