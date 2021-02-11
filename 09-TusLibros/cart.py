@@ -1,10 +1,11 @@
 
 class Cart:
 
-  def __init__(self):
+  def __init__(self, catalogue):
     self.__quantity = 0
     self.__items = {}
     self.__checkout = False
+    self.__catalogue = catalogue
 
   def isEmpty(self):
     return self.__quantity == 0
@@ -13,7 +14,7 @@ class Cart:
     return self.__quantity
 
   def addItem(self, itemId, quantity = 1):
-    if quantity < 1 or itemId == "" or self.__checkout: 
+    if quantity < 1 or itemId == "" or self.__checkout or itemId not in self.__catalogue: 
       return False
 
     self.__items[itemId] = self.__items.get(itemId, 0) + quantity

@@ -3,17 +3,22 @@ from cart import Cart
 
 ITEM_ID_1 = "123"
 ITEM_ID_2 = "456"
+ITEM_ID_3 = "789"
 
 class CarritoTests(unittest.TestCase):
 
   def setUp(self):
-    self.cart = Cart()
+    catalogue = {ITEM_ID_1, ITEM_ID_2}
+    self.cart = Cart(catalogue)
   
   def testANewCartIsEmpty(self):
     self.assertTrue(self.cart.isEmpty())
 
-  def testAnItemCanBeAdded(self):
+  def testAnItemInCatalogueCanBeAdded(self):
     self.assertTrue(self.cart.addItem(ITEM_ID_1, 1))
+
+  def testAnItemNotInCatalogueCanNotBeAdded(self):
+    self.assertFalse(self.cart.addItem(ITEM_ID_3, 1))
 
   def testCartQuantityIsCorrect(self):
     self.cart.addItem(ITEM_ID_1, 1)
