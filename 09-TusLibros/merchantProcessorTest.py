@@ -1,20 +1,19 @@
 import unittest
 from merchantProcessor import MerchantProcessor
-from creditCardValidation import CreditCardValidation
 
-class CashierTests(unittest.TestCase):
+class MerchantProcessorTest(unittest.TestCase):
 
   def setUp(self):
     self.merchantProcessor = MerchantProcessor("1111111111111111", "062021", "John Smith", 1045.93)
 
-  def testATransactionCanBePosted(self):
-      self.assertRaises(CartCannotBeEmpty, lambda: self.cashier.checkOut())
+  def testMerchantProcessorHttpSuccessResponse(self):
+      self.assertTrue(self.merchantProcessor.merchantProcessorSuccessResponse() == {"code": 200, "description": ""})
 
-  def testATransactionCanBePosted(self):
-      self.assertRaises(CartCannotBeEmpty, lambda: self.cashier.checkOut())
+  def testMerchantProcessorHttpSuccessResponseWithError(self):
+      self.assertTrue(self.merchantProcessor.merchantProcessorSuccessWithErrorResponse() == {"code": 200, "description": ""})
 
-  def testATransactionCanBePosted(self):
-    self.assertRaises(CartCannotBeEmpty, lambda: self.cashier.checkOut())
+  def testMerchantProcessorHttpErrorResponse(self):
+    self.assertTrue(self.merchantProcessor.merchantProcessorErrorResponse() == {"code": 400, "description": ""})
 
 
 if __name__ == '__main__':

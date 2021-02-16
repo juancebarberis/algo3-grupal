@@ -13,11 +13,25 @@ class CashierTests(unittest.TestCase):
     catalogue = {self.item_id_1 : 100.50, self.item_id_2 : 120.30}
     self.cart = Cart(catalogue)
     self.sales = Sales()
+    self.merchantProcessor = MerchantProcessor(status = 0)
     self.cashier = Cashier(self.cart, "1111111111111111", "062023", "Jochn Smith", self.sales)
     
   def testAnEmptyCartCannotBeCheckedOut(self):
     self.assertRaises(CartCannotBeEmpty, lambda: self.cashier.checkOut())
+
+  def testCashierChecksCreditCardIsValid(self):
+    self.cart.addItem(self.item_id_1, 1)
+    self.assertIsNone(self.cashier.creditCardIsValid())
+
+  def testACashierCanKnowTheTransactionAmount(self):
+    self.cart.addItem(self.item_id_1, 1)
+    self.cart.addItem(self.item_id_2, 2)
+    self.assertTrue(self.cashier.obtainTransactionAmount() == 341.10)
   
+  def testACashierCanProcessATransaction(self):
+    self.cart.addItem(self.item_id_1, 1)
+    self.assertIsNone(self.cashier.processTransaction())
+
   def testACartWithOneItemCanBeCheckedOut(self):
     self.cart.addItem(self.item_id_1, 1)
     self.assertIsNone(self.cashier.checkOut())
@@ -26,18 +40,6 @@ class CashierTests(unittest.TestCase):
     self.cart.addItem(self.item_id_1, 2)
     self.cart.addItem(self.item_id_2, 1)
     self.assertIsNone(self.cashier.checkOut())
-
-  def testCashierChecksCreditCardIsValid(self):
-    self.cart.addItem(self.item_id_1, 1)
-    self.assertIsNone(self.cashier.checkOut())
-  
-  def testACashierCanKnowTheTransactionAmount(self):
-    self.cart.addItem(self.item_id_1, 1)
-    self.cart.addItem(self.item_id_2, 2)
-    self.assertTrue(self.cashier.obtainTransactionAmount() == 341.10)
-
-  #def testTransactionIsSentToMerchantProcessor(self):
-    #self.cart.addItem(self.item_id_1, 1)
 
 if __name__ == '__main__':
     unittest.main()

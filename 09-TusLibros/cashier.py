@@ -1,5 +1,6 @@
 from errors import CartCannotBeEmpty
 from creditCardValidation import CreditCardValidation
+from merchantProcessor import MerchantProcessor
 
 class Cashier:
 
@@ -14,15 +15,21 @@ class Cashier:
   def obtainTransactionAmount(self):
     return self.__cart.totalAmount()
 
-  def __creditCardIsValid(self):
+  def creditCardIsValid(self):
     self.__creditCardValidation.checkCreditCardNumber(self.__creditCardNumber)
     self.__creditCardValidation.checkCreditCardExpirationDate(self.__creditCardExpiration)
     self.__creditCardValidation.checkCreditCardOwner(self.__creditCardOwner)
     self.__creditCardValidation.checkCreditCardAmount(self.obtainTransactionAmount())
 
+  def processTransaction(self):
+    merchantProcessor = MerchantProcessor(self.__creditCardNumber, self.__creditCardExpiration, self.__creditCardOwner, self.obtainTransactionAmount())
+    merchantProcessor.process()
+
   def checkOut(self):
     if self.__cart.isEmpty():
       raise CartCannotBeEmpty
-    self.__creditCardIsValid()
-    transactionAmount = self.obtainTransactionAmount()
-    merchantProcessor(self.__creditCard.__creditCardNumber, self.__creditCard.__creditCardExpiration, self.__creditCard.__creditCardOwner, transactionAmount)
+    
+    self.creditCardIsValid()
+    
+    self.processTransaction()
+

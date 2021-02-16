@@ -7,4 +7,11 @@ class MerchantProcessor:
     self.__creditCardOwner = creditCardOwner
     self.__transactionAmount = transactionAmount
   
-  def 
+  def merchantProcessorSuccessResponse(self):
+    return {"code": 200, "description": ""}
+
+  def merchantProcessorSuccessWithErrorResponse(self):
+    return {"code": 200, "description": ""}
+
+  def merchantProcessorErrorResponse(self):
+    return {"code": 400, "description": ""}
