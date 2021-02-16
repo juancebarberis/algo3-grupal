@@ -4,7 +4,6 @@ class Cart:
   def __init__(self, catalogue):
     self.__quantity = 0
     self.__items = {}
-    self.__checkout = False
     self.__catalogue = catalogue
 
   def isEmpty(self):
@@ -14,7 +13,7 @@ class Cart:
     return self.__quantity
 
   def addItem(self, itemId, quantity = 1):
-    if quantity < 1 or itemId == "" or self.__checkout or itemId not in self.__catalogue: 
+    if quantity < 1 or itemId == "" or itemId not in self.__catalogue: 
       return False
 
     self.__items[itemId] = self.__items.get(itemId, 0) + quantity
@@ -28,8 +27,9 @@ class Cart:
   def listOfItems(self):
     return self.__items
 
-  def checkOut(self):
-    self.__checkout = self.__quantity > 0
-
-  def isCheckedOut(self):
-    return self.__checkout
+  def totalAmount(self):
+    totalAmount = 0
+    items = self.listOfItems()
+    for item in items:
+      totalAmount += (items[item] * self.__catalogue.get(item))
+    return totalAmount

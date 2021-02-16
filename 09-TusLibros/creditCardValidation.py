@@ -27,6 +27,7 @@ class CreditCardValidation:
       raise NonValidCreditCardOwner
 
   def checkCreditCardAmount(self, amount):
+    amount = str(amount)
     splitedAmount = amount.split(".")
     
     if(len(splitedAmount) != 2):
