@@ -1,0 +1,4 @@
+
+class CartCannotBeEmpty(Exception):
+
+  pass
