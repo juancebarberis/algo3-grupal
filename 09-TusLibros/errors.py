@@ -13,3 +13,15 @@ class NonValidCreditCardOwner(Exception):
 
 class NonValidCreditCardAmount(Exception):
   pass
+
+class ItemNotInCatalogue(Exception):
+  pass
+
+class ItemQuantityCannotBeLessThanOne(Exception):
+  pass
+
+class MerchantProcessorError(Exception):
+  pass
+
+class CheckOutPaymentError(Exception):
+  pass

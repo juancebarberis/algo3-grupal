@@ -1,17 +1,19 @@
+from errors import MerchantProcessorError
+
 
 class MerchantProcessor:
 
-  def __init__(self, creditCardNumber, creditCardExpiration, creditCardOwner, transactionAmount):
-    self.__creditCardNumber = creditCardNumber
-    self.__creditCardExpiration = creditCardExpiration
-    self.__creditCardOwner = creditCardOwner
-    self.__transactionAmount = transactionAmount
-  
-  def merchantProcessorSuccessResponse(self):
-    return {"code": 200, "description": ""}
+    def __init__(self, errorExpected):
+        self.__errorExpected = errorExpected
 
-  def merchantProcessorSuccessWithErrorResponse(self):
-    return {"code": 200, "description": ""}
+    def merchantProcessorSuccessResponse(self):
+        return None
 
-  def merchantProcessorErrorResponse(self):
-    return {"code": 400, "description": ""}
+    def merchantProcessorErrorResponse(self):
+        raise MerchantProcessorError
+
+    def processTransaction(self, creditCardNumber, creditCardExpiration, creditCardOwner, transactionAmount):
+        if not self.__errorExpected:
+          return self.merchantProcessorSuccessResponse()
+        elif self.__errorExpected:
+          return self.merchantProcessorErrorResponse()

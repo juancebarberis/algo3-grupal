@@ -1,10 +1,16 @@
+import uuid
+from errors import ItemNotInCatalogue, ItemQuantityCannotBeLessThanOne
 
 class Cart:
 
   def __init__(self, catalogue):
+    self.__id = uuid.uuid4().hex
     self.__quantity = 0
     self.__items = {}
     self.__catalogue = catalogue
+
+  def getId(self):
+    return self.__id
 
   def isEmpty(self):
     return self.__quantity == 0
@@ -13,14 +19,15 @@ class Cart:
     return self.__quantity
 
   def addItem(self, itemId, quantity = 1):
-    if quantity < 1 or itemId == "" or itemId not in self.__catalogue: 
-      return False
+    if itemId not in self.__catalogue: 
+      raise ItemNotInCatalogue
+
+    if quantity < 1:
+      raise ItemQuantityCannotBeLessThanOne
 
     self.__items[itemId] = self.__items.get(itemId, 0) + quantity
     self.__quantity += quantity
     
-    return True
-
   def quantityOfAnItem(self, itemId):
     return self.__items[itemId] if itemId in self.__items else 0
 
@@ -31,5 +38,8 @@ class Cart:
     totalAmount = 0
     items = self.listOfItems()
     for item in items:
-      totalAmount += (items[item] * self.__catalogue.get(item))
+      totalAmount += (items[item] * self.getPrice(item))
     return totalAmount
+
+  def getPrice(self, itemId):
+    return self.__catalogue[itemId]

@@ -1,4 +1,5 @@
 import unittest
+from errors import ItemNotInCatalogue, ItemQuantityCannotBeLessThanOne
 from cart import Cart
 
 class CarritoTests(unittest.TestCase):
@@ -14,21 +15,18 @@ class CarritoTests(unittest.TestCase):
     self.assertTrue(self.cart.isEmpty())
 
   def testAnItemInCatalogueCanBeAdded(self):
-    self.assertTrue(self.cart.addItem(self.item_id_1, 1))
+    self.assertIsNone(self.cart.addItem(self.item_id_1, 1))
 
   def testAnItemNotInCatalogueCanNotBeAdded(self):
-    self.assertFalse(self.cart.addItem(self.item_id_3, 1))
+    self.assertRaises(ItemNotInCatalogue, lambda: self.cart.addItem(self.item_id_3, 1))
 
   def testCartQuantityIsCorrect(self):
     self.cart.addItem(self.item_id_1, 1)
     self.assertTrue(self.cart.quantity() == 1)
 
   def testAnItemCanNotBeAddedWithQuantityLessThanOne(self):
-    self.assertFalse(self.cart.addItem(self.item_id_1, 0))
+    self.assertRaises(ItemQuantityCannotBeLessThanOne, lambda: self.cart.addItem(self.item_id_1, 0))
 
-  def testAnItemCanNotBeAddedWithEmptyItemId(self):
-    self.assertFalse(self.cart.addItem("", 1))
-  
   def testAnItemCanBeAddedTwiceAndTheQuantityIsCorrect(self):
     self.cart.addItem(self.item_id_1, 1)
     self.cart.addItem(self.item_id_1, 1)
@@ -44,6 +42,12 @@ class CarritoTests(unittest.TestCase):
     self.cart.addItem(self.item_id_1, 1)
     self.cart.addItem(self.item_id_2, 2)
     self.assertTrue(self.cart.totalAmount() == 341.10)
+
+  def testACartIdCanBeRetrieved(self):
+    self.assertIsInstance(self.cart.getId(), str)
+
+  def testACartCanRetrieveThePriceOfAnItem(self):
+    self.assertTrue(self.cart.getPrice(self.item_id_1) == 100.50)
 
 if __name__ == '__main__':
     unittest.main()

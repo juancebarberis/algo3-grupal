@@ -1,16 +1,17 @@
-from errors import CartCannotBeEmpty
+from errors import CartCannotBeEmpty, MerchantProcessorError, CheckOutPaymentError
 from creditCardValidation import CreditCardValidation
 from merchantProcessor import MerchantProcessor
 
 class Cashier:
 
-  def __init__(self, cart, creditCardNumber, creditCardExpiration, creditCardOwner, sales):
+  def __init__(self, cart, merchantProcessor, creditCardNumber, creditCardExpiration, creditCardOwner, sales):
     self.__cart = cart
     self.__creditCardNumber = creditCardNumber
     self.__creditCardExpiration = creditCardExpiration
     self.__creditCardOwner = creditCardOwner
     self.__creditCardValidation = CreditCardValidation()
     self.__sales = sales
+    self.__merchantProcessor = merchantProcessor
 
   def obtainTransactionAmount(self):
     return self.__cart.totalAmount()
@@ -22,8 +23,12 @@ class Cashier:
     self.__creditCardValidation.checkCreditCardAmount(self.obtainTransactionAmount())
 
   def processTransaction(self):
-    merchantProcessor = MerchantProcessor(self.__creditCardNumber, self.__creditCardExpiration, self.__creditCardOwner, self.obtainTransactionAmount())
-    merchantProcessor.process()
+    self.__merchantProcessor.processTransaction(
+      creditCardNumber = self.__creditCardNumber, 
+      creditCardExpiration = self.__creditCardExpiration, 
+      creditCardOwner = self.__creditCardOwner, 
+      transactionAmount = self.obtainTransactionAmount()
+      )
 
   def checkOut(self):
     if self.__cart.isEmpty():
@@ -31,5 +36,9 @@ class Cashier:
     
     self.creditCardIsValid()
     
-    self.processTransaction()
+    try:
+      self.processTransaction()
+    except MerchantProcessorError:
+      raise CheckOutPaymentError
 
+    self.__sales.registerSale(self.__cart)

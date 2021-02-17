@@ -1,9 +1,9 @@
 import unittest
 from cart import Cart
 from sales import Sales
-#from creditCard import CreditCard
 from cashier import Cashier
-from errors import CartCannotBeEmpty
+from merchantProcessor import MerchantProcessor
+from errors import CartCannotBeEmpty, MerchantProcessorError, CheckOutPaymentError
 
 class CashierTests(unittest.TestCase):
 
@@ -13,8 +13,10 @@ class CashierTests(unittest.TestCase):
     catalogue = {self.item_id_1 : 100.50, self.item_id_2 : 120.30}
     self.cart = Cart(catalogue)
     self.sales = Sales()
-    self.merchantProcessor = MerchantProcessor(status = 0)
-    self.cashier = Cashier(self.cart, "1111111111111111", "062023", "Jochn Smith", self.sales)
+    self.merchantProcessor = MerchantProcessor(errorExpected = False)
+    self.merchantProcessor2 = MerchantProcessor(errorExpected = True)
+    self.cashier = Cashier(self.cart, self.merchantProcessor, "1111111111111111", "062023", "John Smith", self.sales)
+    self.cashierWithErrorOnMerchantProcessor = Cashier(self.cart, self.merchantProcessor2, "1111111111111111", "062023", "John Smith", self.sales)
     
   def testAnEmptyCartCannotBeCheckedOut(self):
     self.assertRaises(CartCannotBeEmpty, lambda: self.cashier.checkOut())
@@ -27,19 +29,28 @@ class CashierTests(unittest.TestCase):
     self.cart.addItem(self.item_id_1, 1)
     self.cart.addItem(self.item_id_2, 2)
     self.assertTrue(self.cashier.obtainTransactionAmount() == 341.10)
+
+  def testACartWithOneItemCanBeCheckedOutWithoutMerchantProcessorError(self):
+    self.cart.addItem(self.item_id_1, 1)
+    self.assertIsNone(self.cashier.checkOut())
+
+  def testACartWithOneItemCannotBeCheckedOutDueToMerchantProcessorError(self):
+    self.cart.addItem(self.item_id_1, 1)
+    self.assertRaises(CheckOutPaymentError, lambda: self.cashierWithErrorOnMerchantProcessor.checkOut())
   
-  def testACashierCanProcessATransaction(self):
+  def testACartWithoutErrorInCheckOutRegisterASale(self):
     self.cart.addItem(self.item_id_1, 1)
-    self.assertIsNone(self.cashier.processTransaction())
+    self.cashier.checkOut()
+    self.assertTrue(self.sales.getSales() == {self.cart.getId(): [
+      {"itemId": self.item_id_1, "quantity": 1, "price": 100.50},
+      ]})
 
-  def testACartWithOneItemCanBeCheckedOut(self):
+  def testACartWithErrorInCheckOutDoesNotRegisterASale(self):
     self.cart.addItem(self.item_id_1, 1)
-    self.assertIsNone(self.cashier.checkOut())
-
-  def testACartWithManyItemsCanBeCheckedOut(self):
-    self.cart.addItem(self.item_id_1, 2)
-    self.cart.addItem(self.item_id_2, 1)
-    self.assertIsNone(self.cashier.checkOut())
+    try:
+      self.cashierWithErrorOnMerchantProcessor.checkOut()
+    except CheckOutPaymentError:
+      self.assertTrue(self.sales.getSales() == {})
 
 if __name__ == '__main__':
     unittest.main()
