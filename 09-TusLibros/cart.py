@@ -1,45 +1,59 @@
-import uuid
-from errors import ItemNotInCatalogue, ItemQuantityCannotBeLessThanOne
-
 class Cart:
+    'initialize'
 
-  def __init__(self, catalogue):
-    self.__id = uuid.uuid4().hex
-    self.__quantity = 0
-    self.__items = {}
-    self.__catalogue = catalogue
+    def __init__(self, a_catalog):
+        self._books = []
+        self._catalog = a_catalog
 
-  def getId(self):
-    return self.__id
+    'adding'
 
-  def isEmpty(self):
-    return self.__quantity == 0
+    def add(self, a_book):
+        self.add_with_quantity(a_book, 1)
 
-  def quantity(self):
-    return self.__quantity
+    def add_with_quantity(self, a_book, a_number_of_copies):
+        self._assert_is_in_catalog(a_book)
+        self._assert_valid_number_of_copies(a_number_of_copies)
+        for _ in range(a_number_of_copies):
+            self._books.append(a_book)
 
-  def addItem(self, itemId, quantity = 1):
-    if itemId not in self.__catalogue: 
-      raise ItemNotInCatalogue
+    'accessing'
 
-    if quantity < 1:
-      raise ItemQuantityCannotBeLessThanOne
+    def quantity_of(self, a_book):
+        return self._books.count(a_book)
 
-    self.__items[itemId] = self.__items.get(itemId, 0) + quantity
-    self.__quantity += quantity
-    
-  def quantityOfAnItem(self, itemId):
-    return self.__items[itemId] if itemId in self.__items else 0
+    def total(self):
+        return sum([self._catalog[book] for book in self._books])
 
-  def listOfItems(self):
-    return self.__items
+    'testing'
 
-  def totalAmount(self):
-    totalAmount = 0
-    items = self.listOfItems()
-    for item in items:
-      totalAmount += (items[item] * self.getPrice(item))
-    return totalAmount
+    def includes(self, a_book):
+        return a_book in self._books
 
-  def getPrice(self, itemId):
-    return self.__catalogue[itemId]
+    def is_empty(self):
+        return len(self._books) == 0
+
+    'private - assertions'
+
+    def _assert_is_in_catalog(self, a_book):
+        if a_book not in self._catalog:
+            raise Exception(self.__class__.cannot_add_book_not_in_catalog_error_message())
+
+    def _assert_valid_number_of_copies(self, a_number_of_copies):
+        if a_number_of_copies <= 0:
+            raise Exception(self.__class__.cannot_add_a_non_positive_number_of_copies_error_message())
+
+    'instance creation'
+
+    @classmethod
+    def accepting_items_of(cls, a_catalog):
+        return cls(a_catalog)
+
+    'error messages'
+
+    @classmethod
+    def cannot_add_book_not_in_catalog_error_message(cls):
+        return 'Cannot add a book not from the editorial'
+
+    @classmethod
+    def cannot_add_a_non_positive_number_of_copies_error_message(cls):
+        return 'Cannot add non positive number of copies to the cart'
