@@ -1,10 +1,12 @@
+'Auth service mock'
+
 
 class AuthService:
 
     'initialize'
 
     def __init__(self):
-        self.users = { 'juan' : '1234', 'mariana' : '5678'}
+        self.users = {'juan': '1234', 'mariana': '5678'}
 
     'authentication'
 
