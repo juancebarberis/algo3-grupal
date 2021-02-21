@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from src.iteracion_2.cashier import Cashier
-from src.iteracion_2.publisher_test_objects_factory import PublisherTestObjectsFactory
+from cashier import Cashier
+from publisher_test_objects_factory import PublisherTestObjectsFactory
 
 
 class CashierTest(TestCase):

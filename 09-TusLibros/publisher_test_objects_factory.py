@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from src.iteracion_2.cart import Cart
-from src.iteracion_2.cashier import Cashier
-from src.iteracion_2.credit_card import CreditCard
-from src.iteracion_2.month_of_year import MonthOfYear
+from cart import Cart
+from cashier import Cashier
+from credit_card import CreditCard
+from month_of_year import MonthOfYear
 
 
 class PublisherTestObjectsFactory:

@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from src.iteracion_2.credit_card import CreditCard
-from src.iteracion_2.month_of_year import MonthOfYear
+from credit_card import CreditCard
+from month_of_year import MonthOfYear
 
 
 class CreditCardTest(TestCase):

@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from src.iteracion_2.cart import Cart
+from cart import Cart
 
-from src.iteracion_2.publisher_test_objects_factory import PublisherTestObjectsFactory
+from publisher_test_objects_factory import PublisherTestObjectsFactory
 
 
 class CartTest(TestCase):
