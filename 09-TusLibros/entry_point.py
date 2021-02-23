@@ -8,13 +8,15 @@ class EntryPoint:
 
     'initialize'
 
-    def __init__(self, a_catalogue, merchant_processor, auth_service):
+    def __init__(self, a_catalogue, merchant_processor, auth_service, datetime_object):
         self._auth_service = auth_service
         self._catalogue = a_catalogue
         self._merchant_processor = merchant_processor
+        self._datetime_object = datetime_object
         self._carts = {}
         self._users_carts = {}
         self._sales = {}
+        self._carts_last_update_time = {}
 
     'adding'
 
@@ -24,6 +26,7 @@ class EntryPoint:
         cart = Cart.accepting_items_of(self._catalogue)
         cart_id = uuid.uuid4().hex
         self._carts[cart_id] = cart
+        self._carts_last_update_time[cart_id] = datetime.datetime.now()
 
         if user_id in self._users_carts:
             self._users_carts[user_id].append(cart_id)
@@ -34,6 +37,7 @@ class EntryPoint:
 
     def addToCart(self, cart_id, book_isbn, book_quantity):
         self._assert_cart_id_is_valid(cart_id)
+        self._assert_cart_is_valid(cart_id)
         self._carts[cart_id].add_with_quantity(book_isbn, book_quantity)
 
     'accessing'
@@ -94,3 +98,7 @@ class EntryPoint:
     def _assert_user_and_password_are_valid(self, user_id, password):
         if not self._auth_service.authenticate(user_id, password):
             raise Exception('Invalid credentials')
+    
+    def _assert_cart_is_valid(self, cart_id):
+        if (self._datetime_object.now() - self._carts_last_update_time[cart_id]).seconds > 1800:
+            raise Exception('Cart is no longer valid')

@@ -1,4 +1,5 @@
 import unittest
+import datetime
 from auth_service import AuthService
 from entry_point import EntryPoint
 from publisher_test_objects_factory import PublisherTestObjectsFactory
@@ -8,6 +9,14 @@ class MerchantProcessor:
     def debit_credit_card(self, an_amount_to_debit, credit_card):
         return None
 
+'Datetime mock' 
+class DatetimeMock:
+    def __init__(self, minutes_to_add = 30):
+        self._minutes_to_add = minutes_to_add
+
+    def now(self):
+        return datetime.datetime.now() + datetime.timedelta(minutes = self._minutes_to_add)
+
 class EntryPointTest(unittest.TestCase):
 
     def setUp(self):
@@ -15,7 +24,8 @@ class EntryPointTest(unittest.TestCase):
         self.entry_point = EntryPoint(
             {self._objects_factory.book_from_the_editorial(): self._objects_factory.book_from_the_editorial_price()},
             MerchantProcessor(),
-            AuthService()
+            AuthService(),
+            datetime.datetime
         )
         self.cart_id_length = 32
         self.transaction_id_length = 32
@@ -101,6 +111,19 @@ class EntryPointTest(unittest.TestCase):
             "total_amount": self._objects_factory.book_from_the_editorial_price() * 2,
             "purchases": {self._objects_factory.book_from_the_editorial(): 2}
             })
+    
+    def test12_a_book_cannot_be_added_to_a_cart_after_30_minutes_of_no_action(self):
+        entry_point_with_datetime_mock = EntryPoint(
+            {self._objects_factory.book_from_the_editorial(): self._objects_factory.book_from_the_editorial_price()},
+            MerchantProcessor(),
+            AuthService(),
+            DatetimeMock()
+        )
+        try:
+            cart_id = entry_point_with_datetime_mock.createCart('mariana', '5678')
+            entry_point_with_datetime_mock.addToCart(cart_id, self._objects_factory.book_from_the_editorial(), 1)
+        except Exception as expected_exception:
+            self.assertEqual(str(expected_exception), 'Cart no longer valid')
 
 if __name__ == '__main__':
     unittest.main()
