@@ -1,5 +1,4 @@
 import uuid
-import datetime
 from cart import Cart
 from cashier import Cashier
 
@@ -26,7 +25,7 @@ class EntryPoint:
         cart = Cart.accepting_items_of(self._catalogue)
         cart_id = uuid.uuid4().hex
         self._carts[cart_id] = cart
-        self._carts_last_update_time[cart_id] = datetime.datetime.now()
+        self._carts_last_update_time[cart_id] = self._datetime_object.now()
 
         if user_id in self._users_carts:
             self._users_carts[user_id].append(cart_id)
@@ -38,12 +37,16 @@ class EntryPoint:
     def addToCart(self, cart_id, book_isbn, book_quantity):
         self._assert_cart_id_is_valid(cart_id)
         self._assert_cart_is_valid(cart_id)
+        self._update_last_time(cart_id)
         self._carts[cart_id].add_with_quantity(book_isbn, book_quantity)
 
     'accessing'
 
     def listCart(self, cart_id):
         self._assert_cart_id_is_valid(cart_id)
+        self._assert_cart_is_valid(cart_id)
+        self._update_last_time(cart_id)
+
         cart = self._carts[cart_id]
         content = {}
         for book in self._catalogue:
@@ -70,9 +73,11 @@ class EntryPoint:
 
     def checkOutCart(self, cart_id, credit_card):
         self._assert_cart_id_is_valid(cart_id)
+        self._assert_cart_is_valid(cart_id)
+        self._update_last_time(cart_id)
 
         cashier = Cashier.registering_sales_on([])
-        total_amount = cashier.checkout(self._carts[cart_id], credit_card, self._merchant_processor, datetime.datetime.now())
+        total_amount = cashier.checkout(self._carts[cart_id], credit_card, self._merchant_processor, self._datetime_object.now())
         transaction_id = uuid.uuid4().hex
 
         self._sales[cart_id] = total_amount
@@ -89,6 +94,9 @@ class EntryPoint:
                 base_purchases[book_id] = to_merge_purchases_dictionary[book_id]
         return base_purchases
 
+    def _update_last_time(self, cart_id):
+        self._carts_last_update_time[cart_id] = self._datetime_object.now() 
+
     'private - assertions'
 
     def _assert_cart_id_is_valid(self, a_cart_id):
@@ -100,5 +108,6 @@ class EntryPoint:
             raise Exception('Invalid credentials')
     
     def _assert_cart_is_valid(self, cart_id):
-        if (self._datetime_object.now() - self._carts_last_update_time[cart_id]).seconds > 1800:
+        thirty_minutes_in_second = 1800
+        if (self._datetime_object.now() - self._carts_last_update_time[cart_id]).seconds >= thirty_minutes_in_second:
             raise Exception('Cart is no longer valid')
