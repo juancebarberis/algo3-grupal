@@ -31,8 +31,6 @@ class EntryPointTest(unittest.TestCase):
             AuthService(),
             datetime.datetime
         )
-        self.cart_id_length = 32
-        self.transaction_id_length = 32
         self.invalid_cart_id = "ABCD12345678"
     
     'tests'
@@ -177,7 +175,7 @@ class EntryPointTest(unittest.TestCase):
 
         cartList = entry_point_with_datetime_mock.listCart(cart_id)
         
-        ' Assert if the listCard works.'
+        ' Assert if the listCart works.'
         self.assertIn(self._objects_factory.book_from_the_editorial(), cartList)
 
         'Fast the clock by 20 minutes again and checkout'
